@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="InfiNet.TrackVia.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AccountNumber" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">2000024151</Value>
+    </Setting>
+    <Setting Name="ApiKey" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Hd77KtRKyvAz7J51exrI</Value>
+    </Setting>
+    <Setting Name="ApiUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://secure.trackvia.com/app/api</Value>
+    </Setting>
+    <Setting Name="CustomApiUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://secure.trackvia.com/app/customapipage</Value>
+    </Setting>
+    <Setting Name="TimeZone" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">America/Denver</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/src/InfiNet.TrackVia/bin
+/src/InfiNet.TrackVia/obj
+/src/InfiNet.TrackVia.TestClient/bin
+/src/InfiNet.TrackVia.TestClient/obj
+/src/InfiNet.TrackVia.TestClient/InfiNet.TrackVia.TestClient.csproj.user
+/src/InfiNet.TrackVia.Tests/bin
+/src/InfiNet.TrackVia.Tests/obj
+/src/packages
