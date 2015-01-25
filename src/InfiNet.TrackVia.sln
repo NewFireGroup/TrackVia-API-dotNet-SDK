@@ -14,6 +14,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{946C6A
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget-package", "nuget-package", "{5A1B5CBE-EA8D-4ED0-8DFC-A9C084F5554D}"
+	ProjectSection(SolutionItems) = preProject
+		nuget-package\InfiNet.TrackVia.nuspec = nuget-package\InfiNet.TrackVia.nuspec
+		nuget-package\TrackViaLogo_32x32.jpg = nuget-package\TrackViaLogo_32x32.jpg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

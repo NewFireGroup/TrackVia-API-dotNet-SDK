@@ -10,3 +10,4 @@
 /src/InfiNet.TrackVia.Tests/bin
 /src/InfiNet.TrackVia.Tests/obj
 /src/packages
+*.nupkg
