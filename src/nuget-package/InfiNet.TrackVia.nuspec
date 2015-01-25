@@ -2,11 +2,12 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>InfiNet.TrackVia</id>
-        <version>2.0.1501.2301</version>
+        <version>2.0.1501.2501</version>
         <title>TrackVia API .Net SDK</title>
         <authors>David Boster</authors>
         <licenseUrl>https://github.com/OmahaIT/TrackVia-API-dotNet-SDK/blob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/OmahaIT/TrackVia-API-dotNet-SDK</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/OmahaIT/TrackVia-API-dotNet-SDK/master/src/nuget-package/TrackViaLogo_32x32.jpg</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A Microsoft .NET Framework SDK for accessing your TrackVia application data.</description>
         <copyright>2015</copyright>
