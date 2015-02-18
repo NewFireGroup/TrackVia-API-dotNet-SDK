@@ -85,7 +85,11 @@ namespace InfiNet.TrackVia
         /// <param name="httpClient">async HttpClient helper</param>
         /// <param name="hostName">host of the service api endpoint</param>
         /// <param name="apiUserKey">3Scale user key, granted when registering using the Trackvia Developer Portal</param>
-        /// <returns></returns>
+        /// <returns>TrackViaClient</returns>
+        /// <remarks>
+        /// Helpful when using TrackViaClient in asynchronous environments such as ASP.Net where you want
+        /// to call the AuthorizeAsync(...) instead of Authorize(...)
+        /// </remarks>
         public TrackViaClient(IAsyncHttpClientHelper httpClient, string hostName, string apiUserKey)
         {
             this._baseUriPath = DEFAULT_BASE_URI_PATH;
@@ -97,9 +101,31 @@ namespace InfiNet.TrackVia
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Instantiates a TrackVia client without performing the performing authorization
+        /// </summary>
+        /// <param name="hostName">host of the service api endpoint</param>
+        /// <param name="apiUserKey">3Scale user key, granted when registering using the Trackvia Developer Portal</param>
+        /// <returns></returns>
+        public TrackViaClient(string hostName, string apiUserKey)
+        {
+            this._baseUriPath = DEFAULT_BASE_URI_PATH;
+            this._scheme = DEFAULT_SCHEME;
+            this._hostName = hostName;
+            this._port = DEFAULT_PORT;
+            this._apiKey = apiUserKey;
+
+            _httpClient = new AsyncHttpClientHelper();
+        }
+
         #endregion
 
         #region internal methods
+
+        public OAuth2Token LastGoodToken
+        {
+            get { return this._lastGoodToken; }
+        }
 
         private string GetRefreshToken()
         {
@@ -190,6 +216,42 @@ namespace InfiNet.TrackVia
         /// </remarks>
         public void Authorize(string username, string password)
         {
+            string url = AuthorizeBuildUrl(username, password);
+
+            HttpClientResponse response = _httpClient.SendGetRequestAsync(url).Result;
+
+            AuthorizeHandleResponse(response);
+        }
+
+        /// <summary>
+        /// Authorizes the client for access to views and forms of a given account user.
+        /// </summary>
+        /// <param name="username">name of the account user</param>
+        /// <param name="password">password of the account user</param>
+        /// <remarks>
+        /// Side effect of a successful authentication try is the client saves the resulting
+        /// access and refresh token, caching it for future client calls.
+        /// </remarks>
+        public async Task AuthorizeAsync(string username, string password)
+        {
+            string url = AuthorizeBuildUrl(username, password);
+
+            HttpClientResponse response = await _httpClient.SendGetRequestAsync(url);
+
+            AuthorizeHandleResponse(response);
+        }
+
+        private void AuthorizeHandleResponse(HttpClientResponse response)
+        {
+            CheckTrackViaApiResponseForErrors(response);
+
+            OAuth2Token token = JsonConvert.DeserializeObject<OAuth2Token>(response.Content);
+
+            this._lastGoodToken = token;
+        }
+
+        private string AuthorizeBuildUrl(string username, string password)
+        {
             string path = String.Format("{0}/oauth/token", this._baseUriPath);
             UriBuilder uriBuilder = new UriBuilder()
             {
@@ -206,17 +268,10 @@ namespace InfiNet.TrackVia
             };
 
             string url = uriBuilder.ToString();
-
-            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
-            Request.Wait();
-
-            HttpClientResponse Response = Request.Result;
-            CheckTrackViaApiResponseForErrors(Response);
-            
-            OAuth2Token token = JsonConvert.DeserializeObject<OAuth2Token>(Response.Content);
-
-            this._lastGoodToken = token;
+            return url;
         }
+        
+
 
         /// <summary>
         /// Force refresh of the last known good token, using the refresh token provided
@@ -969,7 +1024,6 @@ namespace InfiNet.TrackVia
         }
 
         #endregion
-
 
         #region Implements IDisposable
 

@@ -23,6 +23,18 @@ namespace InfiNet.TrackVia.Tests
             Record foo = JsonConvert.DeserializeObject<Record>(JsonText, new NestedArrayConverter());
             foo.ShouldNotBeNull();
         }
+
+        [TestMethod]
+        public void InstantiateClient_AysncConstructor_ShouldNotBeNullAndNotMakeAnyWebRequests()
+        {
+            //Assemble
+            // Act
+            TrackViaClient client = new TrackViaClient(TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
+
+            // Assert
+            client.ShouldNotBeNull();
+        }
+
         [TestMethod]
         public void InstantiateClient_SimplifiedParameters_ShouldNotBeNullAndShouldAuthorize()
         {
@@ -32,7 +44,7 @@ namespace InfiNet.TrackVia.Tests
 
             // Act
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake,
-                TestHelper.Username_Fake, TestHelper.ApiKey_Fake, TestHelper.ApiKey_Fake);
+                TestHelper.Username_Fake, TestHelper.Password_Fake, TestHelper.ApiKey_Fake);
 
             // Assert
             client.ShouldNotBeNull();
@@ -51,7 +63,7 @@ namespace InfiNet.TrackVia.Tests
 
             // Act
             TrackViaClient client = new TrackViaClient(httpClient.Object, baseUriPath, scheme, TestHelper.HostName_Fake, port,
-                TestHelper.Username_Fake, TestHelper.ApiKey_Fake, TestHelper.ApiKey_Fake);
+                TestHelper.Username_Fake, TestHelper.Password_Fake, TestHelper.ApiKey_Fake);
 
             // Assert
             client.ShouldNotBeNull();
@@ -96,10 +108,28 @@ namespace InfiNet.TrackVia.Tests
             Mock<IAsyncHttpClientHelper> httpClient = TestHelper.CreateMockHttpAuthorization(token);
 
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake,
-                TestHelper.Username_Fake, TestHelper.ApiKey_Fake, TestHelper.ApiKey_Fake);
+                TestHelper.Username_Fake, TestHelper.Password_Fake, TestHelper.ApiKey_Fake);
 
             // Act
             client.Authorize(TestHelper.Username_Fake, TestHelper.Password_Fake);
+
+            // Assert
+            client.ValidateLastGoodTokenIsEqual(token).ShouldBeTrue("last good token does not match expected result");
+        }
+
+        [TestMethod]
+        public async void TrackViaClient_AuthorizeAsync_ShouldDeserializeJsonAndReturnToken()
+        {
+            // Assemble
+            OAuth2Token token = TestHelper.GetTestAuthToken();
+
+            Mock<IAsyncHttpClientHelper> httpClient = TestHelper.CreateMockHttpAuthorization(token);
+
+            TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake,
+                TestHelper.Username_Fake, TestHelper.Password_Fake, TestHelper.ApiKey_Fake);
+
+            // Act
+            await client.AuthorizeAsync(TestHelper.Username_Fake, TestHelper.Password_Fake);
 
             // Assert
             client.ValidateLastGoodTokenIsEqual(token).ShouldBeTrue("last good token does not match expected result");
@@ -181,7 +211,7 @@ namespace InfiNet.TrackVia.Tests
 
             // Act
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake,
-                TestHelper.Username_Fake, TestHelper.ApiKey_Fake, TestHelper.ApiKey_Fake);
+                TestHelper.Username_Fake, TestHelper.Password_Fake, TestHelper.ApiKey_Fake);
             client.Authorize(TestHelper.Username_Fake, TestHelper.Password_Fake);
             client.RefreshAccessToken();
 

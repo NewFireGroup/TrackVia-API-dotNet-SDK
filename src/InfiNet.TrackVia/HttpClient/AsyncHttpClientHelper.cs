@@ -11,13 +11,14 @@ namespace InfiNet.TrackVia.HttpClient
 
     public interface IAsyncHttpClientHelper : IDisposable
     {
-        System.Threading.Tasks.Task<HttpClientResponse> SendGetRequestAsync(string endPoint);
-        System.Threading.Tasks.Task<HttpClientResponse> SendPostRequestAsync(string endPoint, ICollection<KeyValuePair<string, string>> parameters);
-        System.Threading.Tasks.Task<HttpClientResponse> SendPostFileRequestAsync(string endPoint, string fileName, string filePath);
-        System.Threading.Tasks.Task<HttpClientResponse> SendPostJsonRequestAsync(string endPoint, string jsonContent);
-        System.Threading.Tasks.Task<HttpClientResponse> SendPutJsonRequestAsync(string endPoint, string jsonContent);
-        System.Threading.Tasks.Task<HttpClientResponse> SendDeleteRequestAsync(string endPoint);
-        System.Threading.Tasks.Task<HttpClientResponse> SendGetFileRequestAsync(string endPoint);
+        HttpClientResponse SendGetRequest(string endPoint);
+        Task<HttpClientResponse> SendGetRequestAsync(string endPoint);
+        Task<HttpClientResponse> SendPostRequestAsync(string endPoint, ICollection<KeyValuePair<string, string>> parameters);
+        Task<HttpClientResponse> SendPostFileRequestAsync(string endPoint, string fileName, string filePath);
+        Task<HttpClientResponse> SendPostJsonRequestAsync(string endPoint, string jsonContent);
+        Task<HttpClientResponse> SendPutJsonRequestAsync(string endPoint, string jsonContent);
+        Task<HttpClientResponse> SendDeleteRequestAsync(string endPoint);
+        Task<HttpClientResponse> SendGetFileRequestAsync(string endPoint);
     }
 
     public class AsyncHttpClientHelper : IDisposable, IAsyncHttpClientHelper
@@ -42,6 +43,19 @@ namespace InfiNet.TrackVia.HttpClient
         #endregion
 
         #region Implements IAsyncClientHelper
+        public HttpClientResponse SendGetRequest(string endPoint)
+        {
+            HttpClientResponse sendGetRequestAsyncResult = new HttpClientResponse() { ContentType = HttpClientResponseTypes.unknown };
+
+            HttpResponseMessage response = _httpClient.GetAsync(endPoint).Result;
+
+            sendGetRequestAsyncResult.Content = response.Content.ReadAsStringAsync().Result;
+
+            ParseAndUpdateHttpClientResponse(sendGetRequestAsyncResult, endPoint.ToString(), response);
+
+            return sendGetRequestAsyncResult;
+        }
+
         public async Task<HttpClientResponse> SendGetRequestAsync(string endPoint)
         {
             HttpClientResponse sendGetRequestAsyncResult = new HttpClientResponse() { ContentType = HttpClientResponseTypes.unknown };
