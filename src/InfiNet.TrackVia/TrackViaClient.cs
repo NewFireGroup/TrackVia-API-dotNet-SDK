@@ -270,8 +270,6 @@ namespace InfiNet.TrackVia
             string url = uriBuilder.ToString();
             return url;
         }
-        
-
 
         /// <summary>
         /// Force refresh of the last known good token, using the refresh token provided
@@ -285,6 +283,60 @@ namespace InfiNet.TrackVia
         /// </summary>
         public void RefreshAccessToken()
         {
+            string url = RefreshAccessTokenBuildUrl(GetRefreshToken());
+
+            HttpClientResponse Response = _httpClient.SendGetRequestAsync(url).Result;
+
+            RefreshAccessTokenCheckResponseAndUpdateLastGoodToken(Response);
+        }
+
+        /// <summary>
+        /// Force refresh of the last known good token, using the refresh token provided
+        /// by the service for that token.
+        ///
+        /// The client will automatically try to refresh the access token if it encounters
+        /// an ApiError.InvalidToken error on any service call.  Should this fail, that error
+        /// will be rethrown.  Catching it will provide an empty to handle authentication outside
+        /// of the client.  The advantage of refreshAccessToken is it is faster than calling
+        /// authorize() and you don't have to pass user credentials.
+        /// </summary>
+        public async void RefreshAccessTokenAsync()
+        {
+            string url = RefreshAccessTokenBuildUrl(GetRefreshToken());
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+
+            RefreshAccessTokenCheckResponseAndUpdateLastGoodToken(Response);
+        }
+
+        /// <summary>
+        /// Force refresh of the last known good token using the refresh token provided
+        /// by the supplied refresh token token.
+        /// 
+        /// This is used when trying to instantiate a new TrackVia client using a refresh token
+        /// from another instance (ex: web site without persisting TrackVia client between  requests).
+        /// </summary>
+        /// <param name="validRefreshToken"></param>
+        public async Task RefreshAccessTokenAsync(string validRefreshToken)
+        {
+            string url = RefreshAccessTokenBuildUrl(validRefreshToken);
+            
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+
+            RefreshAccessTokenCheckResponseAndUpdateLastGoodToken(Response);
+        }
+
+        private void RefreshAccessTokenCheckResponseAndUpdateLastGoodToken(HttpClientResponse Response)
+        {
+            CheckTrackViaApiResponseForErrors(Response);
+
+            OAuth2Token token = JsonConvert.DeserializeObject<OAuth2Token>(Response.Content);
+
+            this._lastGoodToken = token;
+        }
+
+        private string RefreshAccessTokenBuildUrl(string validRefreshToken)
+        {
             string path = String.Format("{0}/oauth/token", this._baseUriPath);
             UriBuilder uriBuilder = new UriBuilder()
             {
@@ -295,21 +347,12 @@ namespace InfiNet.TrackVia
                 Query = new UriHelper()
                     .SetParameter(GRANT_TYPE_QUERY_PARAM, REFRESH_TOKEN_QUERY_PARAM_AND_VALID_GRANT_TYPE)
                     .SetParameter(CLIENT_ID_QUERY_PARAM, "TrackViaAPI")
-                    .SetParameter(REFRESH_TOKEN_QUERY_PARAM_AND_VALID_GRANT_TYPE, GetRefreshToken())
+                    .SetParameter(REFRESH_TOKEN_QUERY_PARAM_AND_VALID_GRANT_TYPE, validRefreshToken)
                     .Build()
             };
 
             string url = uriBuilder.ToString();
-
-            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
-            Request.Wait();
-
-            HttpClientResponse Response = Request.Result;
-            CheckTrackViaApiResponseForErrors(Response);
-
-            OAuth2Token token = JsonConvert.DeserializeObject<OAuth2Token>(Response.Content);
-
-            this._lastGoodToken = token;
+            return url;
         }
 
         #endregion
