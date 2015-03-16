@@ -369,7 +369,7 @@ namespace InfiNet.TrackVia
         {
             string path = String.Format("{0}/openapi/apps", this._baseUriPath);
 
-            HttpClientResponse Response = getCommonSharedCode(path);
+            HttpClientResponse Response = GetRecordsCommonSharedCode(path);
 
             List<App> apps = JsonConvert.DeserializeObject<List<App>>(Response.Content);
 
@@ -458,7 +458,30 @@ namespace InfiNet.TrackVia
         {
             string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
 
-            HttpClientResponse Response = getCommonSharedCode(path);
+            HttpClientResponse Response = GetRecordsCommonSharedCode(path);
+
+            RecordSet recordSet = JsonConvert.DeserializeObject<RecordSet>(Response.Content);
+
+            return recordSet;
+        }
+
+        /// <summary>
+        /// Gets records available to the authenticated user in the given view.
+        /// 
+        /// Use with small tables, when all records can be reasonably transferred in a single call.
+        /// </summary>
+        /// <param name="viewId">view identifier in which to get records</param>
+        /// <returns>both field metadata and record data, as a record set</returns>
+        /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
+        /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
+        public async Task<RecordSet> getRecordsAsync(long viewId)
+        {
+            string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
+
+            string url = GetRecordsUrl(path);
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
 
             RecordSet recordSet = JsonConvert.DeserializeObject<RecordSet>(Response.Content);
 
@@ -479,7 +502,7 @@ namespace InfiNet.TrackVia
         {
             string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
 
-            HttpClientResponse Response = getCommonSharedCode(path);
+            HttpClientResponse Response = GetRecordsCommonSharedCode(path);
 
             DomainRecordSet<T> recordSet = JsonConvert.DeserializeObject<DomainRecordSet<T>>(Response.Content);
 
@@ -496,7 +519,7 @@ namespace InfiNet.TrackVia
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
-            HttpClientResponse Response = getCommonSharedCode(path);
+            HttpClientResponse Response = GetRecordsCommonSharedCode(path);
 
             Record record = JsonConvert.DeserializeObject<Record>(Response.Content);
 
@@ -515,7 +538,7 @@ namespace InfiNet.TrackVia
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
-            HttpClientResponse Response = getCommonSharedCode(path);
+            HttpClientResponse Response = GetRecordsCommonSharedCode(path);
 
             DomainRecord<T> record = JsonConvert.DeserializeObject<DomainRecord<T>>(Response.Content);
 
@@ -527,7 +550,20 @@ namespace InfiNet.TrackVia
         /// </summary>
         /// <param name="path">URL path for the Get Request</param>
         /// <returns></returns>
-        private HttpClientResponse getCommonSharedCode(string path)
+        private HttpClientResponse GetRecordsCommonSharedCode(string path)
+        {
+            string url = GetRecordsUrl(path);
+
+            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
+            Request.Wait();
+
+            HttpClientResponse Response = Request.Result;
+            CheckTrackViaApiResponseForErrors(Response);
+
+            return Response;
+        }
+
+        private string GetRecordsUrl(string path)
         {
             UriBuilder uriBuilder = new UriBuilder()
             {
@@ -542,14 +578,7 @@ namespace InfiNet.TrackVia
             };
 
             string url = uriBuilder.ToString();
-
-            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
-            Request.Wait();
-
-            HttpClientResponse Response = Request.Result;
-            CheckTrackViaApiResponseForErrors(Response);
-
-            return Response;
+            return url;
         }
         #endregion
 
@@ -584,6 +613,28 @@ namespace InfiNet.TrackVia
         /// <returns>a list of application objects matching the search criteria, which may be empty</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
+        public async Task<RecordSet> findRecordsAsync(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
+        {
+            string url = findRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+            RecordSet recordSet = JsonConvert.DeserializeObject<RecordSet>(Response.Content);
+
+            return recordSet;
+        }
+
+        /// <summary>
+        /// Finds record matching given search criteria, returning native records.
+        /// </summary>
+        /// <param name="viewId">view identifier in which to search for records</param>
+        /// <param name="searchCriteria">query substring used for a substring match against all of the user-defined fields</param>
+        /// <param name="startIndex">the index (0 based) of the first user record, useful for paging</param>
+        /// <param name="maxRecords">retrieve no more than this many user records, must be 0 < max < 101</param>
+        /// <returns>a list of application objects matching the search criteria, which may be empty</returns>
+        /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
+        /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
         public DomainRecordSet<T> findRecords<T>(long viewId, string searchCriteria, int startIndex, int maxRecords)
         {
             HttpClientResponse Response = findRecordsShared(viewId, searchCriteria, startIndex, maxRecords);
@@ -598,24 +649,7 @@ namespace InfiNet.TrackVia
         /// </summary>
         private HttpClientResponse findRecordsShared(long viewId, string searchCriteria, int startIndex, int maxRecords)
         {
-            string path = String.Format("{0}/openapi/views/{1}/find", this._baseUriPath, viewId);
-
-            UriBuilder uriBuilder = new UriBuilder()
-            {
-                Scheme = this._scheme.ToString(),
-                Host = this._hostName,
-                Port = this._port,
-                Path = path,
-                Query = new UriHelper()
-                     .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
-                     .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
-                     .SetParameter("q", searchCriteria)
-                     .SetParameter("start", startIndex < 0 ? "0" : startIndex.ToString())
-                     .SetParameter("max", maxRecords < 1 ? "50" : maxRecords > 100 ? "100" : maxRecords.ToString())
-                     .Build()
-            };
-
-            string url = uriBuilder.ToString();
+            string url = findRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
 
             Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
             Request.Wait();
@@ -623,6 +657,34 @@ namespace InfiNet.TrackVia
             HttpClientResponse Response = Request.Result;
             CheckTrackViaApiResponseForErrors(Response);
             return Response;
+        }
+
+        private string findRecordsBuildUrl(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
+        {
+            string path = String.Format("{0}/openapi/views/{1}/find", this._baseUriPath, viewId);
+
+            var query = new UriHelper()
+                     .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                     .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
+                     .SetParameter("q", searchCriteria);
+
+            if(startIndex.HasValue)
+                     query.SetParameter("start", startIndex < 0 ? "0" : startIndex.ToString());
+
+            if(maxRecords.HasValue)
+                     query.SetParameter("max", maxRecords < 1 ? "50" : maxRecords > 100 ? "100" : maxRecords.ToString());
+            
+            UriBuilder uriBuilder = new UriBuilder()
+            {
+                Scheme = this._scheme.ToString(),
+                Host = this._hostName,
+                Port = this._port,
+                Path = path,
+                Query = query.Build()
+            };
+
+            string url = uriBuilder.ToString();
+            return url;
         }
 
         #endregion
