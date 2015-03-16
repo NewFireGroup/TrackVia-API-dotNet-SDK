@@ -365,7 +365,7 @@ namespace InfiNet.TrackVia
         /// <returns>list of applications, which may be empty if none are available</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public List<App> getApps()
+        public List<App> GetApps()
         {
             string path = String.Format("{0}/openapi/apps", this._baseUriPath);
 
@@ -382,9 +382,9 @@ namespace InfiNet.TrackVia
         /// <returns>a list of views, which may be empty if none are available</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public List<View> getViews()
+        public List<View> GetViews()
         {
-            return getViews(null);
+            return GetViews(null);
         }
 
         /// <summary>
@@ -394,15 +394,48 @@ namespace InfiNet.TrackVia
         /// <returns>a list of views, which may be empty if none are available</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public List<View> getViews(string optionalName)
+        public List<View> GetViews(string optionalName)
+        {
+            string url = GetViewsBuiltUrl(optionalName);
+
+            HttpClientResponse Response = _httpClient.SendGetRequestAsync(url).Result;
+
+            CheckTrackViaApiResponseForErrors(Response);
+
+            List<View> views = JsonConvert.DeserializeObject<List<View>>(Response.Content);
+
+            return views;
+        }
+
+        /// <summary>
+        /// Gets views matching optionalName parameter available to the authenticated user.
+        /// </summary>
+        /// <param name="optionalName">Optional case sensitive view name to filter results</param>
+        /// <returns>a list of views, which may be empty if none are available</returns>
+        /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
+        /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
+        public async Task<List<View>> GetViewsAsync(string optionalName)
+        {
+            string url = GetViewsBuiltUrl(optionalName);
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+
+            CheckTrackViaApiResponseForErrors(Response);
+
+            List<View> views = JsonConvert.DeserializeObject<List<View>>(Response.Content);
+
+            return views;
+        }
+
+        private string GetViewsBuiltUrl(string optionalName)
         {
             string path = String.Format("{0}/openapi/views", this._baseUriPath);
 
             UriHelper queryStringHelper = new UriHelper()
                      .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
                      .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey());
-                     
-            if(!string.IsNullOrWhiteSpace(optionalName))
+
+            if (!string.IsNullOrWhiteSpace(optionalName))
             {
                 queryStringHelper.SetParameter("name", optionalName);
             }
@@ -417,16 +450,7 @@ namespace InfiNet.TrackVia
             };
 
             string url = uriBuilder.ToString();
-
-            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
-            Request.Wait();
-
-            HttpClientResponse Response = Request.Result;
-            CheckTrackViaApiResponseForErrors(Response);
-
-            List<View> views = JsonConvert.DeserializeObject<List<View>>(Response.Content);
-
-            return views;
+            return url;
         }
 
         /// <summary>
@@ -434,9 +458,9 @@ namespace InfiNet.TrackVia
         /// </summary>
         /// <param name="name">name the case-sensitive view name to get</param>
         /// <returns>the view or null if not found</returns>
-        public View getFirstMatchingView(string name)
+        public View GetFirstMatchingView(string name)
         {
-            List<View> views = getViews(name);
+            List<View> views = GetViews(name);
 
             return (views == null || views.Count == 0) ? (null) : (views[0]);
         }
@@ -454,7 +478,7 @@ namespace InfiNet.TrackVia
         /// <returns>both field metadata and record data, as a record set</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public RecordSet getRecords(long viewId)
+        public RecordSet GetRecords(long viewId)
         {
             string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
 
@@ -474,7 +498,7 @@ namespace InfiNet.TrackVia
         /// <returns>both field metadata and record data, as a record set</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public async Task<RecordSet> getRecordsAsync(long viewId)
+        public async Task<RecordSet> GetRecordsAsync(long viewId)
         {
             string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
 
@@ -498,7 +522,7 @@ namespace InfiNet.TrackVia
         /// <returns>both field metadata and record data, as a record set</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public DomainRecordSet<T> getRecords<T>(long viewId)
+        public DomainRecordSet<T> GetRecords<T>(long viewId)
         {
             string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
 
@@ -515,7 +539,7 @@ namespace InfiNet.TrackVia
         /// <param name="viewId">viewId view identifier in which to get records</param>
         /// <param name="recordId">recordId unique record identifier</param>
         /// <returns></returns>
-        public Record getRecord(long viewId, long recordId)
+        public Record GetRecord(long viewId, long recordId)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
@@ -534,7 +558,7 @@ namespace InfiNet.TrackVia
         /// <returns></returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public DomainRecord<T> getRecord<T>(long viewId, long recordId)
+        public DomainRecord<T> GetRecord<T>(long viewId, long recordId)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
@@ -594,7 +618,7 @@ namespace InfiNet.TrackVia
         /// <returns>a list of application objects matching the search criteria, which may be empty</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public RecordSet findRecords(long viewId, string searchCriteria, int startIndex, int maxRecords)
+        public RecordSet FindRecords(long viewId, string searchCriteria, int startIndex, int maxRecords)
         {
             HttpClientResponse Response = findRecordsShared(viewId, searchCriteria, startIndex, maxRecords);
 
@@ -613,9 +637,9 @@ namespace InfiNet.TrackVia
         /// <returns>a list of application objects matching the search criteria, which may be empty</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public async Task<RecordSet> findRecordsAsync(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
+        public async Task<RecordSet> FindRecordsAsync(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
         {
-            string url = findRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
+            string url = FindRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
 
             HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
             CheckTrackViaApiResponseForErrors(Response);
@@ -635,7 +659,7 @@ namespace InfiNet.TrackVia
         /// <returns>a list of application objects matching the search criteria, which may be empty</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public DomainRecordSet<T> findRecords<T>(long viewId, string searchCriteria, int startIndex, int maxRecords)
+        public DomainRecordSet<T> FindRecords<T>(long viewId, string searchCriteria, int startIndex, int maxRecords)
         {
             HttpClientResponse Response = findRecordsShared(viewId, searchCriteria, startIndex, maxRecords);
 
@@ -649,7 +673,7 @@ namespace InfiNet.TrackVia
         /// </summary>
         private HttpClientResponse findRecordsShared(long viewId, string searchCriteria, int startIndex, int maxRecords)
         {
-            string url = findRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
+            string url = FindRecordsBuildUrl(viewId, searchCriteria, startIndex, maxRecords);
 
             Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
             Request.Wait();
@@ -659,7 +683,7 @@ namespace InfiNet.TrackVia
             return Response;
         }
 
-        private string findRecordsBuildUrl(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
+        private string FindRecordsBuildUrl(long viewId, string searchCriteria, int? startIndex, int? maxRecords)
         {
             string path = String.Format("{0}/openapi/views/{1}/find", this._baseUriPath, viewId);
 
@@ -700,7 +724,7 @@ namespace InfiNet.TrackVia
         /// <returns>both field metadata and record data</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public RecordSet createRecords(long viewId, RecordDataBatch batch)
+        public RecordSet CreateRecords(long viewId, RecordDataBatch batch)
         {
             string path = String.Format("{0}/openapi/views/{1}/records", this._baseUriPath, viewId);
 
@@ -740,7 +764,7 @@ namespace InfiNet.TrackVia
         /// <returns>both field metadata and record data, as a record set of <T> objects</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public DomainRecordSet<T> createRecords<T>(long viewId, DomainRecordDataBatch<T> batch)
+        public DomainRecordSet<T> CreateRecords<T>(long viewId, DomainRecordDataBatch<T> batch)
         {
 
             string path = String.Format("{0}/openapi/views/{1}/records", this._baseUriPath, viewId);
@@ -785,7 +809,7 @@ namespace InfiNet.TrackVia
         /// <returns>Update Record</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public Record updateRecord(long viewId, long recordId, RecordData data)
+        public Record UpdateRecord(long viewId, long recordId, RecordData data)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
@@ -793,7 +817,7 @@ namespace InfiNet.TrackVia
 
             string jsonSerializedData = JsonConvert.SerializeObject(batch);
 
-            HttpClientResponse Response = postCommonSharedCode(path, jsonSerializedData);
+            HttpClientResponse Response = PostCommonSharedCode(path, jsonSerializedData);
 
             RecordSet rsResponse = JsonConvert.DeserializeObject<RecordSet>(Response.Content);
 
@@ -846,14 +870,14 @@ namespace InfiNet.TrackVia
         /// <returns></returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public DomainRecord<T> updateRecord<T>(long viewId, long recordId, T data)
+        public DomainRecord<T> UpdateRecord<T>(long viewId, long recordId, T data)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
             DomainRecordDataBatch<T> batch = new DomainRecordDataBatch<T>(new T[] { data });
             string jsonSerializedData = JsonConvert.SerializeObject(batch); 
             
-            HttpClientResponse Response = postCommonSharedCode(path, jsonSerializedData);
+            HttpClientResponse Response = PostCommonSharedCode(path, jsonSerializedData);
 
             DomainRecordSet<T> recordSet = JsonConvert.DeserializeObject<DomainRecordSet<T>>(Response.Content);
 
@@ -864,7 +888,7 @@ namespace InfiNet.TrackVia
             return record;
         }
 
-        private HttpClientResponse postCommonSharedCode(string path, string jsonSerializedData)
+        private HttpClientResponse PostCommonSharedCode(string path, string jsonSerializedData)
         {
             UriBuilder uriBuilder = new UriBuilder()
             {
@@ -899,7 +923,7 @@ namespace InfiNet.TrackVia
         /// <param name="recordId">unique record identifier</param>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public void deleteRecord(long viewId, long recordId)
+        public void DeleteRecord(long viewId, long recordId)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}", this._baseUriPath, viewId, recordId);
 
@@ -938,7 +962,7 @@ namespace InfiNet.TrackVia
         /// <returns>record for the field being updated</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public Record addFile(long viewId, long recordId, string fileName, string localFilePath)
+        public Record AddFile(long viewId, long recordId, string fileName, string localFilePath)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}/files/{3}", this._baseUriPath, viewId, recordId, fileName);
 
@@ -976,7 +1000,7 @@ namespace InfiNet.TrackVia
         /// <param name="localFilePath">locally accessible path to the file</param>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public void getFile(long viewId, long recordId, string fileName, string localFilePath)
+        public void GetFile(long viewId, long recordId, string fileName, string localFilePath)
         {
             // Overwrites not allowed
             if (System.IO.File.Exists(localFilePath))
@@ -1017,7 +1041,7 @@ namespace InfiNet.TrackVia
         /// <param name="fileName">name of the file (named like the corresponding Trackvia "column")</param>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public void deleteFile(long viewId, long recordId, string fileName)
+        public void DeleteFile(long viewId, long recordId, string fileName)
         {
             string path = String.Format("{0}/openapi/views/{1}/records/{2}/files/{3}", this._baseUriPath, viewId, recordId, fileName);
 
@@ -1056,7 +1080,7 @@ namespace InfiNet.TrackVia
         /// </returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public List<User> getUsers(int start, int max)
+        public List<User> GetUsers(int start, int max)
         {
             string path = String.Format("{0}/openapi/users", this._baseUriPath);
 
@@ -1095,7 +1119,7 @@ namespace InfiNet.TrackVia
         /// <returns>the new user</returns>
         /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
         /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
-        public User createUser(string email, string firstName, string lastName, string timeZone)
+        public User CreateUser(string email, string firstName, string lastName, string timeZone)
         {
             string path = String.Format("{0}/openapi/users", this._baseUriPath);
 

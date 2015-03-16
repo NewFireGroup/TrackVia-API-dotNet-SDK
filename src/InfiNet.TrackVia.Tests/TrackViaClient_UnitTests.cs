@@ -240,7 +240,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            List<App> appsResponse = client.getApps();
+            List<App> appsResponse = client.GetApps();
 
             // Assert
             appsResponse.ShouldNotBeNull()
@@ -269,7 +269,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            List<View> viewsResponse = client.getViews();
+            List<View> viewsResponse = client.GetViews();
 
             // Assert
             viewsResponse.ShouldNotBeNull()
@@ -298,7 +298,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            View viewResponse = client.getFirstMatchingView("Default Contacts View");
+            View viewResponse = client.GetFirstMatchingView("Default Contacts View");
 
             // Assert
             viewResponse.ShouldNotBeNull().ShouldEqual(views[0]);
@@ -321,7 +321,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            RecordSet rsResponse = client.getRecords(1L);
+            RecordSet rsResponse = client.GetRecords(1L);
 
             // Assert
             rsResponse
@@ -354,7 +354,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            DomainRecordSet<TestData.Contact> rsResponse = client.getRecords<TestData.Contact>(1L);
+            DomainRecordSet<TestData.Contact> rsResponse = client.GetRecords<TestData.Contact>(1L);
 
             // Assert
             rsResponse
@@ -378,7 +378,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            Record recordResponse = client.getRecord(1, 1);
+            Record recordResponse = client.GetRecord(1, 1);
 
             // Assert
             recordResponse.ShouldNotBeNull();
@@ -399,7 +399,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            DomainRecord<TestData.Contact> contactRecord = client.getRecord<TestData.Contact>(1, 1);
+            DomainRecord<TestData.Contact> contactRecord = client.GetRecord<TestData.Contact>(1, 1);
 
             // Assert
             contactRecord.ShouldNotBeNull();
@@ -437,7 +437,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            RecordSet rsResponse = client.findRecords(1L, searchCriteria, startIndex, maxRecords);
+            RecordSet rsResponse = client.FindRecords(1L, searchCriteria, startIndex, maxRecords);
 
             // Assert
             rsResponse
@@ -475,7 +475,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            RecordSet rsResponse = client.createRecords(1L, batch);
+            RecordSet rsResponse = client.CreateRecords(1L, batch);
 
             // Assert
             rsResponse
@@ -512,7 +512,7 @@ namespace InfiNet.TrackVia.Tests
             DomainRecordDataBatch<TestData.Contact> batch = new DomainRecordDataBatch<TestData.Contact>(contacts);
 
             // Act
-            DomainRecordSet<TestData.Contact> rsResponse = client.createRecords<TestData.Contact>(1L, batch);
+            DomainRecordSet<TestData.Contact> rsResponse = client.CreateRecords<TestData.Contact>(1L, batch);
 
             // Assert
             rsResponse
@@ -541,7 +541,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            Record updatedRecord = client.updateRecord(1L, 1L, rs.Data[0]);
+            Record updatedRecord = client.UpdateRecord(1L, 1L, rs.Data[0]);
 
             // Assert
             updatedRecord.ShouldNotBeNull();
@@ -564,7 +564,7 @@ namespace InfiNet.TrackVia.Tests
             TestData.Contact contact = TestData.getUnitTestContact1();
 
             // Act
-            DomainRecord<TestData.Contact> responseRecord = client.updateRecord<TestData.Contact>(1L, contact.Id, contact);
+            DomainRecord<TestData.Contact> responseRecord = client.UpdateRecord<TestData.Contact>(1L, contact.Id, contact);
 
             // Assert
             responseRecord.ShouldNotBeNull();
@@ -589,7 +589,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            client.deleteRecord(1L, 1L);
+            client.DeleteRecord(1L, 1L);
         }
 
         #endregion
@@ -622,7 +622,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            Record updatedRecord = client.addFile(1L, 1L, "Test File", tempFilePath);
+            Record updatedRecord = client.AddFile(1L, 1L, "Test File", tempFilePath);
 
             // Assert
             updatedRecord.ShouldNotBeNull();
@@ -658,7 +658,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            client.getFile(1L, 1L, "Test File", tempFilePath);
+            client.GetFile(1L, 1L, "Test File", tempFilePath);
 
             // Assert
             System.IO.File.Exists(tempFilePath).ShouldBeTrue();
@@ -687,7 +687,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            client.deleteFile(1L, 1L, "Test File");
+            client.DeleteFile(1L, 1L, "Test File");
 
             // Assert
         }
@@ -709,7 +709,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            List<User> usersResponse = client.getUsers(0, 25);
+            List<User> usersResponse = client.GetUsers(0, 25);
 
             // Assert
             usersResponse
@@ -733,7 +733,7 @@ namespace InfiNet.TrackVia.Tests
             TrackViaClient client = new TrackViaClient(httpClient.Object, TestHelper.HostName_Fake, TestHelper.ApiKey_Fake);
 
             // Act
-            User userReponse = client.createUser(record.Data.Email, record.Data.FirstName, record.Data.LastName,
+            User userReponse = client.CreateUser(record.Data.Email, record.Data.FirstName, record.Data.LastName,
                 record.Data.TimeZone);
 
             // Assert

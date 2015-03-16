@@ -91,7 +91,7 @@ namespace InfiNet.TrackVia.Tests
             // Act
             TrackViaClient client = new TrackViaClient(IntegrationTestConfig.TRACKVIA_HOSTNAME, IntegrationTestConfig.TRACKVIA_USERNAME, 
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
-            RecordSet rsResult = client.getRecords(IntegrationTestConfig.TRACKVIA_VIEWID_WITHATLEASTTWORECORDS);
+            RecordSet rsResult = client.GetRecords(IntegrationTestConfig.TRACKVIA_VIEWID_WITHATLEASTTWORECORDS);
 
             // Assert 
             rsResult
@@ -119,7 +119,7 @@ namespace InfiNet.TrackVia.Tests
             // Act
             TrackViaClient client = new TrackViaClient(IntegrationTestConfig.TRACKVIA_HOSTNAME, IntegrationTestConfig.TRACKVIA_USERNAME, 
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
-            var viewsResult = client.getViews();
+            var viewsResult = client.GetViews();
 
             // Assert 
             viewsResult.ShouldNotBeNull().ShouldNotBeEmpty();
@@ -145,7 +145,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            var viewsResult = client.getViews("My Accounts");
+            var viewsResult = client.GetViews("My Accounts");
 
             // Assert 
             viewsResult.ShouldNotBeNull().ShouldNotBeEmpty();
@@ -172,7 +172,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            View viewResult = client.getFirstMatchingView("My Accounts");
+            View viewResult = client.GetFirstMatchingView("My Accounts");
 
             // Assert 
             viewResult.ShouldNotBeNull();
@@ -195,7 +195,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            RecordSet rsResult = client.getRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW);
+            RecordSet rsResult = client.GetRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW);
 
             // Assert 
             rsResult.ShouldNotBeNull();
@@ -220,7 +220,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.getRecords<TestData.SimpleCrmContact>(
+            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.GetRecords<TestData.SimpleCrmContact>(
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW);
 
             // Assert 
@@ -250,7 +250,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            Record record = client.getRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, 
+            Record record = client.GetRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, 
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW_VALIDACCOUNTRECORDID);
 
             // Assert 
@@ -270,7 +270,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            DomainRecord<TestData.SimpleCrmContact> record = client.getRecord<TestData.SimpleCrmContact>(
+            DomainRecord<TestData.SimpleCrmContact> record = client.GetRecord<TestData.SimpleCrmContact>(
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW_VALIDACCOUNTRECORDID);
 
@@ -298,7 +298,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            RecordSet rsResult = client.findRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
+            RecordSet rsResult = client.FindRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 searchCriteria, startIndex, maxRecords);
 
             // Assert 
@@ -329,7 +329,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.findRecords<TestData.SimpleCrmContact>(
+            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.FindRecords<TestData.SimpleCrmContact>(
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 searchCriteria, startIndex, maxRecords);
 
@@ -367,7 +367,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            Record updatedRecord = client.addFile(IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD,
+            Record updatedRecord = client.AddFile(IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD,
                 IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD_RECORDID,
                 IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD_FIELDNAME, tempFilePath);
 
@@ -390,7 +390,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            client.getFile(IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD,
+            client.GetFile(IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD,
                 IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD_RECORDID,
                 IntegrationTestConfig.TRACKVIA_VIEWID_INCLUDESFILEFIELD_FIELDNAME, tempFilePath);
 
@@ -414,7 +414,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            List<User> users = client.getUsers(0, 25);
+            List<User> users = client.GetUsers(0, 25);
 
             // Assert 
             users.ShouldNotBeNull();
@@ -438,7 +438,7 @@ namespace InfiNet.TrackVia.Tests
                 IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
 
             // Act
-            RecordSet rsResponse = client.createRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, rsBatch);
+            RecordSet rsResponse = client.CreateRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, rsBatch);
 
             // Assert 
             rsResponse.ShouldNotBeNull();
@@ -463,7 +463,7 @@ namespace InfiNet.TrackVia.Tests
             });
 
             // Act
-            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.createRecords<TestData.SimpleCrmContact>(
+            DomainRecordSet<TestData.SimpleCrmContact> domainRecordSet = client.CreateRecords<TestData.SimpleCrmContact>(
                 IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, batch);
 
             // Assert 
@@ -505,7 +505,7 @@ namespace InfiNet.TrackVia.Tests
             updatedData.Add("Contact Phone", "555-555-5555");
 
             // Act
-            Record updatedResult = client.updateRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
+            Record updatedResult = client.UpdateRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 record.Data.Id, updatedData);
 
             // Assert
@@ -532,7 +532,7 @@ namespace InfiNet.TrackVia.Tests
             // Lets leave one field unchanged, update one field and add a new field value
             Record updatedRecord = Integration_UpdateRecordStep(client, record);
 
-            client.deleteRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
+            client.DeleteRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 updatedRecord.Data.Id);
 
         }
@@ -548,7 +548,7 @@ namespace InfiNet.TrackVia.Tests
             updateData.Add("Contact Phone", "555-555-5555");
 
             // Act
-            Record updatedRecord = client.updateRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
+            Record updatedRecord = client.UpdateRecord(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW,
                 record.Data.Id, updateData);
 
             // Assert
@@ -570,7 +570,7 @@ namespace InfiNet.TrackVia.Tests
 
 
             // Act
-            RecordSet rsResponse = client.createRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, rsBatch);
+            RecordSet rsResponse = client.CreateRecords(IntegrationTestConfig.TRACKVIA_VIEWID_DEMOSIMPLECRM_ACCOUNTSDEFAULTVIEW, rsBatch);
 
             // Assert 
             rsResponse.ShouldNotBeNull();
