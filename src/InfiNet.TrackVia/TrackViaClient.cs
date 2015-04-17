@@ -1156,7 +1156,7 @@ namespace InfiNet.TrackVia
 
         #region Unpublished API
 
-        public async Task<string> UnpublishedGetAppResources(string accountId)
+        public async Task<string> UnpublishedGetAppResources(long accountId)
         {
             // /accounts/12178/resources?format=flat&access_token=
             string path = String.Format("{0}/accounts/{1}/resources", this._baseUriPath, accountId);
@@ -1186,7 +1186,7 @@ namespace InfiNet.TrackVia
         }
 
 
-        public async Task<Table> UnpublishedGetTable(string accountId, long appId, long tableId)
+        public async Task<Table> UnpublishedGetTable(long accountId, long appId, long tableId)
         {
             // /accounts/12178/resources?format=flat&access_token=
             string path = String.Format("{0}/accounts/{1}/apps/{2}/tables/{3}", this._baseUriPath, accountId, appId, tableId);
@@ -1214,7 +1214,7 @@ namespace InfiNet.TrackVia
             return tableDefinition;
         }
 
-        public async Task<Table> UnpublishedCreateTable(string accountId, long appId, Table tableDefinition)
+        public async Task<Table> UnpublishedCreateTable(long accountId, long appId, Table tableDefinition)
         {
             // /accounts/12178/resources?format=flat&access_token=
             string path = String.Format("{0}/accounts/{1}/apps/{2}/tables", this._baseUriPath, accountId, appId);
