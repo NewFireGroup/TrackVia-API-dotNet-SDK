@@ -66,6 +66,8 @@
     <Compile Include="Model\DomainRecord.cs" />
     <Compile Include="Model\DomainRecordDataBatch.cs" />
     <Compile Include="Model\DomainRecordSet.cs" />
+    <Compile Include="Model\Table.cs" />
+    <Compile Include="Model\TableFieldMetadata.cs" />
     <Compile Include="Model\FieldMetadata.cs" />
     <Compile Include="Model\IIdentifiable.cs" />
     <Compile Include="Model\NestedArrayConverter.cs" />

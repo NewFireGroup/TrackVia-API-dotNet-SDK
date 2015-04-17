@@ -423,6 +423,112 @@ namespace InfiNet.TrackVia.Tests
 
         #endregion
 
+        #region Unpublished API Tests
+
+        [TestMethod]
+        public async Task IntegrationTest_TrackViaClient_UnpublishedApplicationResources()
+        {
+            TestHelper.EnsureProductionValuesBeforeRunningIntegrationTests();
+
+            // Assemble
+
+            // Act
+            TrackViaClient client = new TrackViaClient(IntegrationTestConfig.TRACKVIA_HOSTNAME, IntegrationTestConfig.TRACKVIA_USERNAME,
+                IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
+
+            string result = await client.UnpublishedGetAppResources(IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_ACCOUNTID);
+
+            // Assert 
+            result.ShouldNotBeEmpty();
+        }
+
+        [TestMethod]
+        public async Task IntegrationTest_TrackViaClient_UnpublishedGetTable()
+        {
+            TestHelper.EnsureProductionValuesBeforeRunningIntegrationTests();
+
+            // Assemble
+            long appId = 9;
+            long tableId = 106;
+
+            // Act
+            TrackViaClient client = new TrackViaClient(IntegrationTestConfig.TRACKVIA_HOSTNAME, IntegrationTestConfig.TRACKVIA_USERNAME,
+                IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
+
+            Table tableResult = await client.UnpublishedGetTable(IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_ACCOUNTID, appId, tableId);
+
+            // Assert 
+            tableResult.ShouldNotBeNull();
+            tableResult.Name.ShouldEqual("New Table");
+            tableResult.Fields.ShouldNotBeEmpty();
+            tableResult.Fields.Count.ShouldEqual(1);
+            tableResult.Fields[0].Name.ShouldEqual("Name");
+        }
+
+
+        [TestMethod]
+        public async Task IntegrationTest_TrackViaClient_UnpublishedCopyTable()
+        {
+            TestHelper.EnsureProductionValuesBeforeRunningIntegrationTests();
+            
+            // Assemble
+
+            TrackViaClient client = new TrackViaClient(IntegrationTestConfig.TRACKVIA_HOSTNAME, IntegrationTestConfig.TRACKVIA_USERNAME,
+                IntegrationTestConfig.TRACKVIA_PASSWORD, IntegrationTestConfig.TRACKVIA_API_KEY);
+
+            Table tableResult = await client.UnpublishedGetTable(IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_ACCOUNTID, 
+                IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_APPID, 
+                IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_COPYTABLE_SOURCETABLEID);
+            
+            // Change our fields
+            tableResult.AppId = IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_APPID;
+            tableResult.Id = null;
+            tableResult.Updated = null;
+            tableResult.Created = null;
+            tableResult.Dirty = true;
+            tableResult.Name += " Copy";
+            //tableResult.TempIdentifierTemplate = "${New Field}";
+            tableResult.ParsedIdentifierTemplate = tableResult.IdentifierTemplate
+                .Replace("$", "")
+                .Replace("{", "[")
+                .Replace("}", "]");
+            
+            foreach(var field in tableResult.Fields)
+            {
+                field.Id = null;
+                //if (!field.Required.GetValueOrDefault())
+                //    field.Required = null;
+                //field.DisplayOrder = null;
+                //field.PartOfRecordId = null;
+
+                //if(field.Type == "shortAnswer")
+                //{
+                //    field.GridColWidth = 150;
+                //    field.GridEditable = true;
+                //    field.GridTemplate = "{{ field.value }}";
+                //    field.Group = "text";
+                //}
+                //if(field.Type == "paragraph")
+                //{
+                //    field.DisplayName = "Paragraph";
+                //    field.Group = "text";
+                //    field.GridColWidth = 300;
+                //    field.GridEditable = true;
+                //    field.GridTemplate = null;
+                //}
+            }
+
+            // Act
+            Table newTableResult = await client.UnpublishedCreateTable(IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_ACCOUNTID, IntegrationTestConfig.TRACKVIA_UNPUBLISHEDAPI_APPID, tableResult);
+            
+            // Assert
+            tableResult.ShouldNotBeNull();
+            tableResult.Name.ShouldNotBeNull().EndsWith(" Copy").ShouldBeTrue();
+            tableResult.Fields.ShouldNotBeEmpty();
+            tableResult.Fields.Count.ShouldEqual(tableResult.Fields.Count);
+        }
+        #endregion
+
         #region Integration Tests (Manual)
 
         [TestMethod]

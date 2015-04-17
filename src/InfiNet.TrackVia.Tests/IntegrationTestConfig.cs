@@ -23,5 +23,8 @@ namespace InfiNet.TrackVia.Tests
         public const long TRACKVIA_VIEWID_INCLUDESFILEFIELD_RECORDID = 0L;
         public const string TRACKVIA_VIEWID_INCLUDESFILEFIELD_FIELDNAME = "";
         public const string IMAGE_FILE_FULL_PATH_FOR_UPLOAD = @"";
+        public const long TRACKVIA_UNPUBLISHEDAPI_ACCOUNTID = 0L;
+        public const long TRACKVIA_UNPUBLISHEDAPI_APPID = 0L;
+        public const long TRACKVIA_UNPUBLISHEDAPI_COPYTABLE_SOURCETABLEID = 0L;
     }
 }

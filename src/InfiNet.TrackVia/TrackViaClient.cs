@@ -1154,6 +1154,96 @@ namespace InfiNet.TrackVia
 
         #endregion
 
+        #region Unpublished API
+
+        public async Task<string> UnpublishedGetAppResources(string accountId)
+        {
+            // /accounts/12178/resources?format=flat&access_token=
+            string path = String.Format("{0}/accounts/{1}/resources", this._baseUriPath, accountId);
+
+            UriBuilder uriBuilder = new UriBuilder()
+            {
+                Scheme = this._scheme.ToString(),
+                Host = this._hostName,
+                Port = this._port,
+                Path = path,
+                Query = new UriHelper()
+                    .SetParameter("format", "flat")
+                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
+                    .Build()
+            };
+
+            string url = uriBuilder.ToString();
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+
+            //List<App> apps = JsonConvert.DeserializeObject<List<App>>(Response.Content);
+
+            return Response.Content;
+        }
+
+
+        public async Task<Table> UnpublishedGetTable(string accountId, long appId, long tableId)
+        {
+            // /accounts/12178/resources?format=flat&access_token=
+            string path = String.Format("{0}/accounts/{1}/apps/{2}/tables/{3}", this._baseUriPath, accountId, appId, tableId);
+
+            UriBuilder uriBuilder = new UriBuilder()
+            {
+                Scheme = this._scheme.ToString(),
+                Host = this._hostName,
+                Port = this._port,
+                Path = path,
+                Query = new UriHelper()
+                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
+                    .Build()
+            };
+
+            string url = uriBuilder.ToString();
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+
+            Table tableDefinition = JsonConvert.DeserializeObject<Table>(Response.Content);
+
+            return tableDefinition;
+        }
+
+        public async Task<Table> UnpublishedCreateTable(string accountId, long appId, Table tableDefinition)
+        {
+            // /accounts/12178/resources?format=flat&access_token=
+            string path = String.Format("{0}/accounts/{1}/apps/{2}/tables", this._baseUriPath, accountId, appId);
+
+            UriBuilder uriBuilder = new UriBuilder()
+            {
+                Scheme = this._scheme.ToString(),
+                Host = this._hostName,
+                Port = this._port,
+                Path = path,
+                Query = new UriHelper()
+                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
+                    .Build()
+            };
+
+            string url = uriBuilder.ToString();
+
+            string jsonSerializedData = JsonConvert.SerializeObject(tableDefinition);
+
+            HttpClientResponse Response = await _httpClient.SendPostJsonRequestAsync(url, jsonSerializedData);
+            CheckTrackViaApiResponseForErrors(Response);
+
+            Table tableResult = JsonConvert.DeserializeObject<Table>(Response.Content);
+
+            return tableResult;
+        }
+        #endregion
+
         #region Implements IDisposable
 
         public void Dispose()
