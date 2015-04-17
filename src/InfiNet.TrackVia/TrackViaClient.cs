@@ -377,6 +377,24 @@ namespace InfiNet.TrackVia
         }
 
         /// <summary>
+        /// Gets the applications available to the authenticated user.
+        /// </summary>
+        /// <returns>list of applications, which may be empty if none are available</returns>
+        /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
+        /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
+        public async Task<List<App>> GetAppsAsync()
+        {
+            string path = String.Format("{0}/openapi/apps", this._baseUriPath);
+
+            HttpClientResponse Response = await GetRecordsCommonSharedCodeAsync(path);
+
+            List<App> apps = JsonConvert.DeserializeObject<List<App>>(Response.Content);
+
+            return apps;
+        }
+
+
+        /// <summary>
         /// Gets views available to the authenticated user.
         /// </summary>
         /// <returns>a list of views, which may be empty if none are available</returns>
@@ -578,14 +596,28 @@ namespace InfiNet.TrackVia
         {
             string url = GetRecordsUrl(path);
 
-            Task<HttpClientResponse> Request = _httpClient.SendGetRequestAsync(url);
-            Request.Wait();
+            HttpClientResponse Response = _httpClient.SendGetRequestAsync(url).Result;
 
-            HttpClientResponse Response = Request.Result;
             CheckTrackViaApiResponseForErrors(Response);
 
             return Response;
         }
+
+        /// <summary>
+        /// Common getRecord(s) code between RecordSet and DomainRecordSet methods
+        /// </summary>
+        /// <param name="path">URL path for the Get Request</param>
+        /// <returns></returns>
+        private async Task<HttpClientResponse> GetRecordsCommonSharedCodeAsync(string path)
+        {
+            string url = GetRecordsUrl(path);
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+            return Response;
+        }
+
 
         private string GetRecordsUrl(string path)
         {
@@ -1212,6 +1244,34 @@ namespace InfiNet.TrackVia
             Table tableDefinition = JsonConvert.DeserializeObject<Table>(Response.Content);
 
             return tableDefinition;
+        }
+
+        public async Task<List<Table>> UnpublishedGetTables(long accountId, long appId)
+        {
+            // /accounts/12178/resources?format=flat&access_token=
+            string path = String.Format("{0}/accounts/{1}/apps/{2}/tables", this._baseUriPath, accountId, appId);
+
+            UriBuilder uriBuilder = new UriBuilder()
+            {
+                Scheme = this._scheme.ToString(),
+                Host = this._hostName,
+                Port = this._port,
+                Path = path,
+                Query = new UriHelper()
+                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
+                    .Build()
+            };
+
+            string url = uriBuilder.ToString();
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+
+            List<Table> tableResults = JsonConvert.DeserializeObject<List<Table>>(Response.Content);
+
+            return tableResults;
         }
 
         public async Task<Table> UnpublishedCreateTable(long accountId, long appId, Table tableDefinition)
