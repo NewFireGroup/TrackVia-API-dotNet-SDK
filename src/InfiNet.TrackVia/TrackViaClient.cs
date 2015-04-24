@@ -535,6 +535,31 @@ namespace InfiNet.TrackVia
         /// 
         /// Use with small tables, when all records can be reasonably transferred in a single call.
         /// </summary>
+        /// <param name="viewId">view identifier in which to get records</param>
+        /// <param name="startIndex">the index (0 based) of the first user record, useful for paging</param>
+        /// <param name="maxRecords">retrieve no more than this many user records, must be 0 < max < 101</param>
+        /// <returns>both field metadata and record data, as a record set</returns>
+        /// <exception cref="TrackViaApiException">if the service fails to process this request</exception>
+        /// <exception cref="TrackviaClientException">if an error occurs outside the service, failing the request</exception>
+        public async Task<RecordSet> GetRecordsAsync(long viewId, int startIndex, int maxRecords)
+        {
+            string path = String.Format("{0}/openapi/views/{1}", this._baseUriPath, viewId);
+
+            string url = GetRecordsUrl(path, startIndex, maxRecords);
+
+            HttpClientResponse Response = await _httpClient.SendGetRequestAsync(url);
+            CheckTrackViaApiResponseForErrors(Response);
+
+            RecordSet recordSet = JsonConvert.DeserializeObject<RecordSet>(Response.Content);
+
+            return recordSet;
+        }
+
+        /// <summary>
+        /// Gets records available to the authenticated user in the given view.
+        /// 
+        /// Use with small tables, when all records can be reasonably transferred in a single call.
+        /// </summary>
         /// <typeparam name="T">return instances of this type (instead of a raw record Map<String, Object>)</typeparam>
         /// <param name="viewId">viewId view identifier in which to get records</param>
         /// <returns>both field metadata and record data, as a record set</returns>
@@ -618,22 +643,35 @@ namespace InfiNet.TrackVia
             return Response;
         }
 
-
         private string GetRecordsUrl(string path)
+        {
+            return GetRecordsUrl(path, null, null);
+        }
+
+        private string GetRecordsUrl(string path, int? start, int? max)
         {
             UriBuilder uriBuilder = new UriBuilder()
             {
                 Scheme = this._scheme.ToString(),
                 Host = this._hostName,
                 Port = this._port,
-                Path = path,
-                Query = new UriHelper()
-                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
-                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey())
-                    .Build()
+                Path = path
             };
 
+            var uriHelper = new UriHelper()
+                    .SetParameter(ACCESS_TOKEN_QUERY_PARAM, GetAccessToken())
+                    .SetParameter(USER_KEY_QUERY_PARAM, GetApiUserKey());
+
+            if (start != null)
+                uriHelper.SetParameter("start", string.Format("{0}", start));
+
+            if (max != null)
+                uriHelper.SetParameter("max", string.Format("{0}", max));
+
+            uriBuilder.Query = uriHelper.Build();
+
             string url = uriBuilder.ToString();
+            
             return url;
         }
         #endregion
